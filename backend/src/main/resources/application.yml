@@ -2,7 +2,7 @@ spring:
   application:
     name: developer-job-tracker-api
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/jobtracker}
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:jobtracker}
     username: ${DATABASE_USERNAME:jobtracker}
     password: ${DATABASE_PASSWORD:jobtracker}
   jpa:
