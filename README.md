@@ -2,9 +2,19 @@
 
 A full-stack portfolio project for tracking software-engineering job applications, interview progress, recruiter contacts, follow-ups, and offers.
 
-## Current Milestone: OpenAPI Documentation & Continuous Integration
+## Current Milestone: Versioned Database Migrations & PostgreSQL Integration Testing
 
-The project now includes interactive OpenAPI/Swagger documentation and an automated GitHub Actions CI pipeline. The pipeline verifies backend tests, frontend lint/build health, and Docker Compose configuration on pushes and pull requests while preserving the existing JWT-secured multi-user architecture.
+The application now uses Flyway as the single source of truth for database schema changes and validates the JPA model against that schema at startup. GitHub Actions also boots a real PostgreSQL 18 container through Testcontainers, runs the Flyway migration, validates the Hibernate mappings, and verifies persistence through Spring Data JPA.
+
+### Database engineering & integration testing
+
+- Versioned Flyway migrations under `backend/src/main/resources/db/migration`
+- PostgreSQL-specific Flyway support
+- Hibernate `ddl-auto: validate` to detect entity/schema drift
+- Testcontainers PostgreSQL integration testing
+- Spring Boot `@ServiceConnection` wiring for test databases
+- Integration coverage that verifies Flyway history and real JPA persistence
+- PostgreSQL 18 container used during CI backend verification
 
 ### API documentation & CI
 
@@ -65,9 +75,11 @@ The project now includes interactive OpenAPI/Swagger documentation and an automa
 - Dashboard statistics by status
 - Structured validation, authentication, duplicate-account, and 404 errors
 - PostgreSQL persistence
+- Flyway-managed schema migrations
 - Spring Boot Actuator health endpoint
 - OpenAPI 3 / Swagger UI documentation
 - Unit tests for auth behavior and per-user application isolation
+- PostgreSQL Testcontainers integration testing
 
 ## Stack
 
@@ -86,8 +98,10 @@ The project now includes interactive OpenAPI/Swagger documentation and an automa
 - OAuth2 Resource Server JWT support
 - Spring Data JPA / Hibernate
 - PostgreSQL
+- Flyway
 - Jakarta Bean Validation
 - JUnit 5 / Mockito
+- Testcontainers
 
 ### DevOps
 - GitHub Actions CI
@@ -143,6 +157,24 @@ Spring Security validates JWT
       |
       v
 API queries only the authenticated user's rows
+```
+
+## Database Migration Flow
+
+```text
+Application startup / integration test
+              |
+              v
+            Flyway
+              |
+              v
+Versioned SQL migrations
+              |
+              v
+PostgreSQL schema
+              |
+              v
+Hibernate validates entity mappings
 ```
 
 ## API Endpoints
@@ -202,15 +234,24 @@ Vite proxies `/api` requests to the backend running at `http://localhost:8080`.
 
 ## Run Backend for Local Development
 
-Start PostgreSQL, configure the environment values shown in `.env.example`, then run the Spring Boot application from the `backend` directory using Maven or your IDE.
+Start PostgreSQL, configure the environment values shown in `.env.example`, then run the Spring Boot application from the `backend` directory using Maven or your IDE. Flyway automatically applies pending migrations before Hibernate validates the schema.
 
-If you previously ran a pre-authentication milestone and stored local data, using a fresh development database/volume is the simplest upgrade path because applications now require an owning user account.
+## Run Backend Tests
+
+Docker must be running for the PostgreSQL Testcontainers integration test.
+
+```bash
+cd backend
+mvn verify
+```
+
+The test suite includes fast unit tests plus a real PostgreSQL integration test that exercises Flyway and Spring Data JPA together.
 
 ## Continuous Integration
 
 The repository includes `.github/workflows/ci.yml`. On pushes to `main` and on pull requests it runs three independent checks:
 
-1. **Backend tests** — Java 21 + Maven `verify`
+1. **Backend tests** — Java 21 + Maven `verify`, including PostgreSQL Testcontainers integration testing
 2. **Frontend quality** — npm dependency install, ESLint, and production Vite build
 3. **Container configuration** — `docker compose config --quiet`
 
@@ -218,9 +259,8 @@ The workflow intentionally uses read-only repository permissions.
 
 ## Planned Next Milestones
 
-- Database migrations with Flyway
-- Integration tests with Testcontainers
 - Cloud deployment
+- Production observability and structured application metrics
 
 ## Author
 
