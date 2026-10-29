@@ -1,10 +1,26 @@
 # Developer Job Tracker
 
-A full-stack portfolio project for tracking software-engineering job applications, interview progress, recruiter contacts, follow-ups, and offers.
+A production-deployed full-stack portfolio project for tracking software-engineering job applications, interview progress, recruiter contacts, follow-ups, and offers.
 
-## Current Milestone: Versioned Database Migrations & PostgreSQL Integration Testing
+**Live Demo:** https://nicholas-cornes-job-tracker.onrender.com/  
+**API Health:** https://nicholas-cornes-job-tracker-api.onrender.com/actuator/health  
+**Swagger UI:** https://nicholas-cornes-job-tracker-api.onrender.com/swagger-ui.html
 
-The application now uses Flyway as the single source of truth for database schema changes and validates the JPA model against that schema at startup. GitHub Actions also boots a real PostgreSQL 18 container through Testcontainers, runs the Flyway migration, validates the Hibernate mappings, and verifies persistence through Spring Data JPA.
+## Current Milestone: Production Deployment
+
+The application is deployed on Render as three connected production resources: a React static site, a Dockerized Spring Boot API, and a managed PostgreSQL 18 database. The backend uses Flyway-managed migrations, JWT authentication, health monitoring, and environment-based secrets/configuration. GitHub Actions validates backend tests, frontend lint/build health, and Docker Compose configuration before deployment.
+
+### Production deployment
+
+- React + TypeScript frontend deployed as a Render static site
+- Spring Boot API deployed from a multi-stage Docker image
+- Managed PostgreSQL 18 database
+- Private database networking
+- Environment-generated JWT signing secret
+- Production CORS configuration
+- Actuator health check endpoint
+- Render Blueprint infrastructure defined in `render.yaml`
+- Automatic deployment gated by passing GitHub checks
 
 ### Database engineering & integration testing
 
@@ -88,7 +104,7 @@ The application now uses Flyway as the single source of truth for database schem
 - TypeScript
 - Vite
 - Responsive CSS
-- Nginx production container
+- Render Static Sites
 
 ### Backend
 - Java 21
@@ -107,7 +123,8 @@ The application now uses Flyway as the single source of truth for database schem
 - GitHub Actions CI
 - Docker
 - Docker Compose
-- Nginx reverse proxy
+- Render Blueprint
+- Managed PostgreSQL
 - Environment-based secrets/configuration
 
 ## Architecture
@@ -116,17 +133,14 @@ The application now uses Flyway as the single source of truth for database schem
 Browser
    |
    v
-React + TypeScript UI
+React + TypeScript UI (Render Static Site)
    |
-   |  Bearer JWT
+   | HTTPS + Bearer JWT
    v
-Nginx / API proxy
+Spring Boot REST API (Render Docker Service)
    |
    v
 Spring Security
-   |
-   v
-Spring Boot REST API
    |
    v
 Service Layer
@@ -135,7 +149,7 @@ Service Layer
 User-scoped Spring Data JPA queries
    |
    v
-PostgreSQL
+PostgreSQL 18 (Render Managed Database)
 ```
 
 ## Authentication Flow
@@ -259,8 +273,8 @@ The workflow intentionally uses read-only repository permissions.
 
 ## Planned Next Milestones
 
-- Cloud deployment
 - Production observability and structured application metrics
+- Additional end-to-end browser testing
 
 ## Author
 
