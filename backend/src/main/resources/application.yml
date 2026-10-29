@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: developer-job-tracker-api
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/jobtracker}
+    username: ${DATABASE_USERNAME:jobtracker}
+    password: ${DATABASE_PASSWORD:jobtracker}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${PORT:8080}
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  jwt:
+    secret: ${JWT_SECRET:local-development-secret-change-before-production-123456}
+    expiration-hours: ${JWT_EXPIRATION_HOURS:24}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
