@@ -1,6 +1,7 @@
 import type { ApiError } from '../types'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api'
+const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN ?? '').replace(/\/$/, '')
+const API_BASE = `${API_ORIGIN}/api`
 const TOKEN_KEY = 'developer-job-tracker-token'
 
 export function getAuthToken() {
